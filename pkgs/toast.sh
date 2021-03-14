@@ -4,17 +4,28 @@ pkg="toast"
 pkgopts=$@
 cleanup=""
 
-version=2.3.12
-pfile=toast-${version}.tar.gz
-src=$(eval "@TOP_DIR@/tools/fetch_check.sh" https://github.com/hpc4cmb/toast/archive/${version}.tar.gz ${pfile})
+# TGZ VERSION:
+#version=2.3.12
+#pfile=toast-${version}.tar.gz
+#src=$(eval "@TOP_DIR@/tools/fetch_check.sh" https://github.com/hpc4cmb/toast/archive/${version}.tar.gz ${pfile})
+#
+#if [ "x${src}" = "x" ]; then
+#    echo "Failed to fetch ${pkg}" >&2
+#    exit 1
+#fi
+#cleanup="${src}"
 
-if [ "x${src}" = "x" ]; then
+rm -rf ${pkg}
+repo=$( git clone https://github.com/hpc4cmb/${pkg}.git 1>&2; \
+        /bin/ls ${pkg} 2>/dev/null )
+
+if [ "x${repo}" = "x" ]; then
     echo "Failed to fetch ${pkg}" >&2
     exit 1
 fi
-cleanup="${src}"
+cleanup="${pkg}"
 
-log="../../log_${pkg}"
+log=$(realpath "log_${pkg}")
 
 echo "Building ${pkg}..." >&2
 
@@ -68,10 +79,13 @@ if [ "x$lapack" != "x" ]; then
     lapacklib="-DLAPACK_LIBRARIES=${lapack}"
 fi
 
-rm -rf toast-${version}
-tar xzf ${src} \
-    && cd toast-${version} \
-    && cleanup="${cleanup} $(pwd)" \
+# TGZ VERSION:
+#rm -rf toast-${version}
+#tar xzf ${src} \
+#    && cd toast-${version} \
+#    && cleanup="${cleanup} $(pwd)" \
+
+cd ${pkg} \
     && mkdir -p build \
     && cd build \
     && cmake \
