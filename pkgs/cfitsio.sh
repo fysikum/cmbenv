@@ -4,7 +4,8 @@ pkg="cfitsio"
 pkgopts=$@
 cleanup=""
 
-pfile=cfitsio3450.tar.gz
+version=3.49
+pfile=cfitsio-${version}.tar.gz
 src=$(eval "@TOP_DIR@/tools/fetch_check.sh" http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/${pfile} ${pfile})
 
 if [ "x${src}" = "x" ]; then
@@ -17,9 +18,9 @@ log="../log_${pkg}"
 
 echo "Building ${pkg}..." >&2
 
-rm -rf cfitsio
+rm -rf cfitsio-${version}
 tar xzf ${src} \
-    && cd cfitsio \
+    && cd cfitsio-${version} \
     && cleanup="${cleanup} $(pwd)" \
     && CC="@CC@" CFLAGS="@CFLAGS@" ./configure @CROSS@ \
     --prefix="@AUX_PREFIX@" --enable-reentrant > ${log} 2>&1 \
