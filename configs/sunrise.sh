@@ -1,3 +1,5 @@
+umask 0022
+
 # Unload conflicting modules: 
 module -q unload $(module -t list | awk -F/ '$1 ~ "^openmpi*|^gnu*|^nix*" {print $1}' )
 
