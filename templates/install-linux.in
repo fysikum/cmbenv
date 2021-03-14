@@ -45,20 +45,40 @@ prepend_env "PKG_CONFIG_PATH" "@AUX_PREFIX@/lib/pkgconfig"
 
 # Install packages
 
+function call_installer () {
+    local srcdir="$1"; shift
+    local pkgname="$1"; shift
+    local cln=""
+    if [ -f "done_${pkgname}" ]; then
+        echo -e "\nSkipping ${pkgname} (already done)"
+    else
+        echo -e "\nExecuting ${srcdir}/${pkgname}.sh $*..."
+        cln=$(eval ${srcdir}/${pkgname}.sh $*)
+        if [ $? -ne 0 ]; then
+            echo -e "\nFAILED\n"
+            exit 1
+        else # success
+            date > "done_${pkgname}"
+        fi 
+    fi
+}
+
 @PACKAGES@
 
 # Compile python modules
 
-echo "Compiling python packages..."
+echo -e "\nCompiling python packages..."
 python3 -m compileall -f "@AUX_PREFIX@" > log_pycompile
 
 # Install environment init file
 
+echo -e "\nInstall environment init file..."
 cp "$0.init" "@PREFIX@/cmbenv_init.sh"
 
 # Install modulefile
 
 if [ "x@MODULE_DIR@" != "x" ]; then
+    echo -e "\nInstalling modulefile..."
     mkdir -p "@MODULE_DIR@"
     cp "$0.mod" "@MODULE_DIR@/@VERSION@"
     cp "$0.modver" "@MODULE_DIR@/.version_@VERSION@"
@@ -66,10 +86,12 @@ fi
 
 # Install logo
 
+echo -e "\nInstalling logo..."
 cp "@TOP_DIR@"/logo-*.png "@PREFIX@/"
 
 # Set permissions
 
+echo -e "\nSetting permissions..."
 if [ "x@CHGRP@" != "x" ]; then
     chgrp -R @CHGRP@ "@PREFIX@"
 fi
@@ -77,3 +99,5 @@ fi
 if [ "x@CHMOD@" != "x" ]; then
     chmod -R @CHMOD@ "@PREFIX@"
 fi
+
+echo -e "\nSuccess.\n"

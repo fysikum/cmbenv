@@ -148,7 +148,8 @@ while IFS='' read -r line || [[ -n "${line}" ]]; do
             pcom="RUN cln=\$(./${outpkg}/${pkgname}.sh ${pkgopts}) && if [ \"x\${cln}\" != \"x\" ]; then for cl in \${cln}; do if [ -e \"\${cl}\" ]; then rm -rf \"\${cl}\"; fi; done; fi"
             pkgcom+="${pcom}"$'\n'$'\n'
         else
-            pcom="cln=\$(${topdir}/${outpkg}/${pkgname}.sh ${pkgopts}); if [ \$? -ne 0 ]; then echo \"FAILED\"; exit 1; fi"
+            # pcom="cln=\$(${topdir}/${outpkg}/${pkgname}.sh ${pkgopts}); if [ \$? -ne 0 ]; then echo \"FAILED\"; exit 1; fi"
+            pcom="call_installer ${topdir}/${outpkg} ${pkgname} ${pkgopts}"
             pkgcom+="${pcom}"$'\n'$'\n'
         fi
     fi
@@ -194,7 +195,7 @@ if [ "x${docker}" != "xyes" ]; then
     echo "# Then do \"source cmbenv\" as usual." >> "${outinit}"
     echo "#" >> "${outinit}"
     if [ -e "${confshinit}" ]; then
-        cat "${confshinit}" >> "${outinit}"
+        cat "${confshinit}" | sed 's#@VERSION@#${version}#g' >> "${outinit}"
     fi
     echo "unset PYTHONSTARTUP" >> "${outinit}"
     echo "export PYTHONUSERBASE=\$HOME/.local/cmbenv-${version}" >> "${outinit}"
