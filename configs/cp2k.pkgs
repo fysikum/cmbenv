@@ -1,0 +1,33 @@
+# Packages in the cp2k environment:
+#
+#   spglib, libxc, libxsmm, libint, cp2k
+#
+# Other requirements for cp2k lodaded as modulefiles:
+# (see configs/cp2k.sh and pkgs/module-cp2k.sh):
+#
+#   gmpxx, mpfr, eigen, fftw, gsl, boost, openblas, scalapack
+# 
+# spglib: a library for finding and handling crystal symmetries written in C.
+spglib 
+# 
+# libxc: a library of exchange-correlation and kinetic energy functionals 
+# for density-functional theory.
+libxc
+#
+# libxsmm: a library for specialized dense and sparse matrix operations as 
+# well as for deep learning primitives such as small convolutions. 
+libxsmm  
+#
+# libint: a library for the evaluation of molecular integrals of many-body 
+# operators over Gaussian functions
+libint
+#
+# cp2k: a quantum chemistry and solid state physics software package that can
+# perform atomistic simulations of solid state, liquid, molecular, periodic,
+# material, crystal, and biological systems.
+#
+cp2k
+#
+# Modulefile for CP2K.
+module-cp2k
+#

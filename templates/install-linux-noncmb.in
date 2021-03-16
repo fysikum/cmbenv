@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# Initialize environment
+
+if [ -e "@CONFFILE@.sh" ]; then
+    source "@CONFFILE@.sh"
+fi
+
+# Add install prefix to our environment.
+
+mkdir -p "@PYTHON_PREFIX@/bin"
+mkdir -p "@PYTHON_PREFIX@/lib"
+mkdir -p "@AUX_PREFIX@/include"
+mkdir -p "@AUX_PREFIX@/bin"
+mkdir -p "@AUX_PREFIX@/lib/python@PYVERSION@/site-packages"
+pushd "@AUX_PREFIX@" > /dev/null
+if [ ! -e lib64 ]; then
+    ln -s lib lib64
+fi
+popd > /dev/null
+
+prepend_env () {
+    # This function is needed since trailing colons
+    # on some environment variables can cause major
+    # problems...
+    local envname="$1"
+    local envval="$2"
+    eval "local temp=\"\${$envname}\""
+    if [ -z ${temp+x} ]; then
+        export ${envname}="${envval}"
+    else
+        export ${envname}="${envval}:${temp}"
+    fi
+}
+
+prepend_env "CMAKE_PREFIX_PATH" "@AUX_PREFIX@"
+prepend_env "PATH" "@PYTHON_PREFIX@/bin"
+prepend_env "PATH" "@AUX_PREFIX@/bin"
+prepend_env "CPATH" "@AUX_PREFIX@/include"
+prepend_env "LIBRARY_PATH" "@AUX_PREFIX@/lib"
+prepend_env "LD_LIBRARY_PATH" "@AUX_PREFIX@/lib"
+prepend_env "PYTHONPATH" "@AUX_PREFIX@/lib/python@PYVERSION@/site-packages"
+prepend_env "PKG_CONFIG_PATH" "@AUX_PREFIX@/lib/pkgconfig"
+
+# Install packages
+
+function call_installer () {
+    local srcdir="$1"; shift
+    local pkgname="$1"; shift
+    local cln=""
+    if [ -f "done_${pkgname}" ]; then
+        echo -e "\nSkipping ${pkgname} (already done)"
+    else
+        echo -e "\nExecuting ${srcdir}/${pkgname}.sh $*..."
+        cln=$(eval ${srcdir}/${pkgname}.sh $*)
+        if [ $? -ne 0 ]; then
+            echo -e "\nFAILED\n"
+            exit 1
+        else # success
+            date > "done_${pkgname}"
+        fi 
+    fi
+}
+
+@PACKAGES@
+
+# Compile python modules
+
+echo -e "\nCompiling python packages..."
+python3 -m compileall -f "@AUX_PREFIX@" > log_pycompile
+
+# Set permissions
+
+echo -e "\nSetting permissions..."
+if [ "x@CHGRP@" != "x" ]; then
+    chgrp -R @CHGRP@ "@PREFIX@"
+fi
+
+if [ "x@CHMOD@" != "x" ]; then
+    chmod -R @CHMOD@ "@PREFIX@"
+fi
+
+echo -e "\nSuccess.\n"
