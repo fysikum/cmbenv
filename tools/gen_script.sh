@@ -81,9 +81,9 @@ done < "${conffile}"
 # We add these predefined matches at the end- so that the config
 # file can actually use these as well.
 
-compiled_prefix="${prefix}/cmbenv_aux"
-python_prefix="${prefix}/cmbenv_python"
-module_dir="${moddir}/cmbenv"
+compiled_prefix=${COMPILED_PREFIX:-"${prefix}/cmbenv_aux"}
+python_prefix=${PYTHON_PREFIX:-"${prefix}/cmbenv_python"}
+module_dir=${MODULE_DIR:-"${moddir}/cmbenv"}
 
 if [ "x${docker}" = "xyes" ]; then
     if [ "x${prefix}" = "x" ]; then
