@@ -101,3 +101,18 @@ pympit
 #
 # Install TOAST.
 toast
+#
+# Install qpoint. A lightweight quaternion-based library for telescope pointing.
+qpoint
+#
+# Install pixell. A library for handling maps stored in rectangular pixelization.
+pixell
+#
+# Install sotodlib. Tools for working with real and simulated time ordered data.
+sotodlib
+#
+# Install so-pysm-models. Sky components models for PySM 3.
+so-pysm-models
+#
+# Install so3g. Glue functions and new classes for SO work in spt3g.
+so3g
