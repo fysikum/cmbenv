@@ -27,7 +27,7 @@ version=""
 moduledir=""
 dockertag=""
 
-while getopts ":c:p:v:m:" opt; do
+while getopts ":c:p:v:m:t:" opt; do
     case $opt in
         c)
             config=$OPTARG
