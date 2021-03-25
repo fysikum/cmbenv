@@ -19,7 +19,7 @@ log=$(realpath "log_${pkg}")
 echo "Building ${pkg}..." >&2
 
 cd ${pkg} \
-    && pip install pixell > ${log} 2>&1
+    && pip3 install pixell > ${log} 2>&1
 
 if [ $? -ne 0 ]; then
     echo "Failed to build ${pkg}" >&2

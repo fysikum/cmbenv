@@ -8,7 +8,7 @@ log=$(realpath "log_${pkg}")
 
 echo "Building ${pkg}..." >&2
 
-pip install https://github.com/simonsobs/so_pysm_models/archive/master.zip > ${log} 2>&1
+pip3 install https://github.com/simonsobs/so_pysm_models/archive/master.zip > ${log} 2>&1
 
 if [ $? -ne 0 ]; then
     echo "Failed to build ${pkg}" >&2
