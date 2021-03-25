@@ -1,3 +1,66 @@
+# cmbenv for the CoPS group at Fysikum
+
+This repoistory is a fork of https://github.com/hpc4cmb/cmbenv.
+It adds the following functionality:
+
+- configuration for the Sunrise cluster at Fysikum
+  where `TOAST` is cloned by git, and the additional packages
+  are installed:
+  `qpoint`, `pixell`, `sotodlib`, `so-pysm-models`, and `so3g`.
+
+- Ubuntu based Docker image compatible with the Sunrise configuration
+
+- configuration to build the chemical package `cp2k`
+
+Bellow are the instructions how to build and use the CoPS Docker imaga.
+
+## Building cmbenv CoPS Docker image
+
+First, clone the repo, then generate the Dockerfile and 
+build the corresponding Docker image:
+
+``` bash
+git clone https://github.com/fysikum/cmbenv.git
+cd cmbenv
+
+./cmbenv -c docker-cops-ubuntu -p /usr
+
+docker build -t simonsobs -f Dockerfile_docker-cops-ubuntu .
+```
+
+The build proces takes around one hour.
+The last command cen be repated, in which case it should complete
+almost instantly. 
+Note that we have tagged the image `simonsobs`, which can be visible
+after issuing `docker image ls`:
+
+
+```
+REPOSITORY   TAG         IMAGE ID            CREATED           SIZE
+simonsobs    latest      315ee758c047        59 seconds ago    7.1GB
+...
+```
+
+To run the image do:
+
+```
+user@laptop:~/cmbenv$ docker run -it simonsobs bash
+
+root@fdc9defc28b0:~# pwd
+/home/cmbenv
+
+root@fdc9defc28b0:~# 
+```
+
+Note that you are now running a bash shell as root on Ubuntu. 
+To test the TOAST installation do:
+
+```
+root@fdc9defc28b0:~# python -c "import toast.tests; toast.tests.run()"
+```
+
+--------------------
+
 # cmbenv
 
 ## Introduction

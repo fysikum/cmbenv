@@ -116,3 +116,6 @@ so-pysm-models
 #
 # Install so3g. Glue functions and new classes for SO work in spt3g.
 so3g
+#
+# Easy-install egg libraries.
+so-egg-libs
