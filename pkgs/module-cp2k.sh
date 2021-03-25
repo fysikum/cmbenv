@@ -41,6 +41,7 @@ setenv          CP2K_DIR        @AUX_PREFIX@
 setenv          CP2K_BIN        @AUX_PREFIX@/bin
 setenv          CP2K_INC        @AUX_PREFIX@/include
 setenv          CP2K_LIB        @AUX_PREFIX@/lib64
+setenv          CP2K_DATA_DIR   @AUX_PREFIX@/data
 EOF
 
 if [ $? -ne 0 ]; then

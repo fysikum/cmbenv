@@ -8,7 +8,7 @@ cleanup=""
 # with all git submodules included (do not use a tar.gz source code archive!)
 
 version=8.1
-pfile=cp2k-${version}.tar.gz
+pfile=cp2k-${version}.tar.bz2
 src=$(eval "@TOP_DIR@/tools/fetch_check.sh" https://github.com/cp2k/cp2k/releases/download/v8.1.0/cp2k-${version}.tar.bz2  ${pfile})
 
 if [ "x${src}" = "x" ]; then
@@ -28,6 +28,8 @@ flavor="psmp"
 # https://github.com/cp2k/cp2k/blob/master/INSTALL.md
 
 cat > cp2k_${arch}.${flavor} <<EOF
+# Created $(date +'%Y-%m-%d %H:%M:%S'), Mikica (Fysikum, SU)
+
 CC          = mpicc
 FC          = mpif90
 LD          = mpif90
@@ -69,13 +71,17 @@ LDFLAGS    += -L@AUX_PREFIX@/lib
 LDFLAGS    += -L${FFTW_LIB}
 LDFLAGS    += -L${OPENBLAS_LIB}
 LDFLAGS    += -L${SCALAPACK_LIB}
+
+DATA_DIR    = @AUX_PREFIX@/data
 EOF
 
 rm -rf cp2k-${version}
+
 tar xjf ${src} \
+    && mv -f cp2k_${arch}.${flavor} "cp2k-${version}/arch/${arch}.${flavor}" \
+    && rsync -a "cp2k-${version}/" "@AUX_PREFIX@/" >> ${log} 2>&1 \
     && cd cp2k-${version} \
     && cleanup="${cleanup} $(pwd)" \
-    && mv -f ../cp2k_${arch}.${flavor} arch/${arch}.${flavor} \
     && make -j @MAKEJ@ ARCH=${arch} VERSION=${flavor} >> ${log} 2>&1 \
     && rsync -av "exe/${arch}/" "@AUX_PREFIX@/bin/" >> ${log} 2>&1
 

@@ -3,3 +3,4 @@ pool
 build
 install_*
 build_*
+slurm*.out
