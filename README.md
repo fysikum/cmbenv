@@ -61,7 +61,11 @@ git clone https://gitlab.fysik.su.se/hpc-support/cmbenv-test-sim.git
 Next we create a container which will be used for running simulations.
 
 ``` bash
-docker create -it --name=sim-1 --hostname=sim-1 --volume=$HOME/cmbenv-test-sim:/my-project --shm-size=1024M simonsobs
+docker create -it \
+  --name=sim-1 --hostname=sim-1 \
+  --volume=$HOME/cmbenv-test-sim:/my-project \
+  --shm-size=1024M \
+  simonsobs
 ```
 
 Here we specified the following options:
@@ -124,7 +128,11 @@ docker image ls -a
 
 # Create container
 git clone https://gitlab.fysik.su.se/hpc-support/cmbenv-test-sim.git
-docker create -it --name=sim-1 --hostname=sim-1 --volume=$HOME/cmbenv-test-sim:/my-project --shm-size=1024M simonsobs
+docker create -it \
+  --name=sim-1 --hostname=sim-1 \
+  --volume=$HOME/cmbenv-test-sim:/my-project \
+  --shm-size=1024M \
+  simonsobs
 docker start sim-1
 docker ps -a
 
