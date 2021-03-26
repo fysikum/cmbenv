@@ -3,20 +3,21 @@
 This repository is a fork of https://github.com/hpc4cmb/cmbenv.
 It adds the following functionality:
 
-- configuration for the Sunrise cluster at Fysikum where `TOAST` is 
-  cloned by git, and the additional packages are installed: 
+- a configuration for the Sunrise cluster at Fysikum. In this version, `TOAST` is 
+  cloned by git and some additional packages are installed: 
   `qpoint`, `pixell`, `sotodlib`, `so-pysm-models`, and `so3g`.
 
 - Ubuntu based Docker image compatible with the Sunrise configuration
 
-- configuration to build the chemical package `cp2k`
+- a configuration to build the chemical package `cp2k`
 
-Bellow are the instructions how to build and use the CoPS Docker image.
+Bellow are the instructions how to build the CoPS Docker image and use it, 
+e.g., on a laptop.
 
 ## Building cmbenv CoPS Docker image
 
-First, clone the repository, then generate the Dockerfile and 
-build the corresponding Docker image:
+First, clone the repository, then generate a Dockerfile and 
+build the derived Docker image (here tagged `simonsobs`:
 
 ``` bash
 git clone https://github.com/fysikum/cmbenv.git
@@ -27,39 +28,111 @@ cd cmbenv
 time docker build -t simonsobs -f Dockerfile_docker-cops-ubuntu .
 ```
 
-The build process takes around one hour.
-The last command can be repeated, in which case it should complete
-almost instantly. 
-Note that we have tagged the image `simonsobs`, which can be visible
-after issuing `docker image ls`:
+The build process takes around one hour. It will build a Ubuntu based image.
+See `Dockerfile_docker-cops-ubuntu` for the commands which will be executed
+during the build prcoess.
 
-```
-REPOSITORY   TAG         IMAGE ID            CREATED           SIZE
-simonsobs    latest      315ee758c047        59 seconds ago    7.1GB
-...
+Note that the build command can be repeated, in which case it should complete
+almost instantly.
+
+At the end, the image `simonsobs` should be visible after issuing `docker image ls`:
+
+``` bash
+docker image ls
+
+# REPOSITORY   TAG         IMAGE ID            CREATED           SIZE
+# simonsobs    latest      315ee758c047        59 seconds ago    7.1GB
+# ...
 ```
 
-Now you can run the image:
+Now we can create one or more containers from the image. 
+A suggestion is to create one container for each project.
+
+## Using cmbenv CoPS Docker image
+
+In this example we shall create a container for the 
+[`cmbenv test simuation](https://gitlab.fysik.su.se/hpc-support/cmbenv-test-sim).
+First, we clone the repository:
 
 ```  bash
-docker run -it simonsobs bash
-```
-
-Note that you are now running a bash shell as root on Ubuntu. 
-The TOAST installation can be done by executing the 
-following command (inside the container):
-
-```
-python -c "import toast.tests; toast.tests.run()"
-```
-
-Finally, try to run a test simulation for the TOAST framework from the 
-repository [`cmbenv-test-sim`](https://gitlab.fysik.su.se/hpc-support/cmbenv-test-sim):
-
-```
 git clone https://gitlab.fysik.su.se/hpc-support/cmbenv-test-sim.git
-cd cmbenv-test-sim/
-bash job.sh 
+```
+
+Next we create a container which will be used for running simulations.
+
+``` bash
+docker create -it --name=sim-1 --hostname=sim-1 --volume=$HOME/cmbenv-test-sim:/my-project --shm-size=1024M simonsobs
+```
+
+Here we specified the following options:
+
+ * `-it` indicates that the container will be for interactive use
+ * `--name sim-1` sets the name of the conainer (to label the project)
+ * `--hostnamename sim-1` sets the hostname (which will be a part of the shell prompt inside the container)
+ * `--volume=$HOME/cmbenv-test-sim:/my-project` binds a local directory to docker 
+   (`~/cmbenv-test-sim` will appear as `/my-project` inside the container).
+ * `--shm-size=1024M` reserves 1GB shared memory for the container (required for OpenMPI)
+
+The container `sim-1` is now ready for use and can be started using `docker start`. The status
+can be seen using `docker ps`:
+
+``` bash
+docker start sim-1
+docker ps -a
+```
+
+To interactively 'login' on to the container, use `docker exec -it`:
+
+``` bash
+docker exec -it sim-1 bash
+```
+
+At this point we will get a bash shell prompt `root@sim-1:~#`, indicating that we are inside the container.
+Note that the container is Ubuntu (type `cat /etc/*rele*` to confirm) to confirm.
+As usual, to activate the cmbenv environment use `source`:
+
+``` bash
+source cmbenv
+```
+
+Finally, we can run our test simulation. (Recall that the `cmbenv-test-sim` repository 
+resides in `/my-project` inside the container.)
+
+``` bash
+cd /my-project
+bash job.sh  | tee log
+```
+
+## Some useful docker commands
+
+* `docker image ls [-a]`
+* `docker container ps [-a]` l
+* `docker container ls [-a]`
+* `docker container start <name>` starts the container
+* `docker container stop <name>` stops the container
+* `docker container rm <name>` removes the container
+
+## Complete command log
+
+``` bash
+# Build image
+git clone https://github.com/fysikum/cmbenv.git
+cd cmbenv
+./cmbenv -c docker-cops-ubuntu -p /usr
+time docker build -t simonsobs -f Dockerfile_docker-cops-ubuntu .
+docker image ls -a
+
+# Create container
+git clone https://gitlab.fysik.su.se/hpc-support/cmbenv-test-sim.git
+docker create -it --name=sim-1 --hostname=sim-1 --volume=$HOME/cmbenv-test-sim:/my-project --shm-size=1024M simonsobs
+docker start sim-1
+docker ps -a
+
+# Run simulation
+docker exec -it sim-1 bash
+source cmbenv
+cd /my-project
+bash job.sh  | tee log
 ```
 
 --------------------
