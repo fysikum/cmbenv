@@ -109,9 +109,9 @@ bash job.sh  | tee log
 
 ## Some useful docker commands
 
-* `docker image ls [-a]`
-* `docker container ps [-a]` l
-* `docker container ls [-a]`
+* `docker image ls [-a]` lists images
+* `docker ps [-a]` lists containers
+* `docker container ls [-a]` lists containers
 * `docker container start <name>` starts the container
 * `docker container stop <name>` stops the container
 * `docker container rm <name>` removes the container
